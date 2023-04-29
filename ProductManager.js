@@ -1,3 +1,4 @@
+const { error } = require("console");
 const fs = require("fs")
 
 class ProducManager{
@@ -16,37 +17,80 @@ class ProducManager{
     }
 
     async addProduct(nuevoProducto){
-        nuevoProducto.id = await this.getNewId()
-        let productos = await this.getProducts()
-        productos.push(nuevoProducto)
-        await fs.promises.writeFile(this.products, JSON.stringify(productos))
+        try{
+            nuevoProducto.id = await this.getNewId()
+            let productos = await this.getProducts()            
+            let validateCode = productos.find(elem => elem.code === nuevoProducto.code)//Busca el producto igual según código
+            if(validateCode){
+                console.log("This code already exists")                
+            } else{
+                productos.push(nuevoProducto)
+            }     
+            await fs.promises.writeFile(this.products, JSON.stringify(productos))
+        } catch(error){
+            console.log("Hubo un error:", error)
+
+        }
+
+               
     }
 
     async getProducts(){
-        let productos = await fs.promises.readFile(this.products, "utf-8")
-        let objProduct = JSON.parse(productos)
-        return objProduct
+        try{
+            let productos = await fs.promises.readFile(this.products, "utf-8")
+            let objProduct = JSON.parse(productos)
+            return objProduct
+        } catch(error){
+            console.log("Hubo un error:", error)
+        }    
     }
 
     async getProdctById(id){
-        let array =  await this.getProducts()
-        return array.find(busq => busq.id == id)
+        try{            
+            let array =  await this.getProducts();
+            if(!array.find(busq => busq.id == id)){
+                return "Producto no existe"
+            } else{
+                return array.find(busq => busq.id == id)
+            }           
+            } catch(error){
+                console.log("Hubo un error:", error)
+            }       
         
     }
 
-    async updateProduct(id,actualizar){
-        let array =  await this.getProducts()
-        let cambiar = array.findIndex(ele => ele.id === id)
-        actualizar.id = id
-        array.splice(cambiar,1,actualizar)
-        await fs.promises.writeFile(this.products, JSON.stringify(array))
+    
+    async updateProduct(id, actualizar){
+        try{
+            let array = await this.getProducts()
+            let product = array.find(products => products.id === id);
+            const newProduct = { ...product, ...actualizar }
+            //console.log(newProduct)
+            let cambiar = array.findIndex(ele => ele.id === id)
+            //console.log(cambiar)
+            //console.log(array[cambiar] )
+            array[cambiar] = newProduct
+            await fs.promises.writeFile(this.products, JSON.stringify(array))
+        } catch(error){
+            console.log("Hubo un error:", error)
+        } 
+
     }
 
     async deleteProduct(id){
-        let array =  await this.getProducts()
-        let eliminar = array.findIndex(ele => ele.id === id)
-        array.splice(eliminar,1)
-        await fs.promises.writeFile(this.products, JSON.stringify(array))
+        try{
+            let array =  await this.getProducts()
+            let eliminar = array.findIndex(ele => ele.id === id)
+            if(eliminar == -1){
+                throw new Error("This Id not exist")
+                //console.log("This product not exist")
+            } else{array.splice(eliminar,1)}           
+
+            await fs.promises.writeFile(this.products, JSON.stringify(array))
+        } catch(error){
+            console.log("Hubo un error:", error)
+        }
+        
     } 
 }
 

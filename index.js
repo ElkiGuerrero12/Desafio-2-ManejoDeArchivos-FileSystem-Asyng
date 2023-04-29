@@ -39,11 +39,11 @@ const main = async () =>{
         stock : 20
     }
 
-    await manager.addProduct(product1)
-    await manager.addProduct(product2)
-    await manager.addProduct(product3)
+    //await manager.addProduct(product1)
+    //await manager.addProduct(product2)
+    //await manager.addProduct(product3)   
     //console.log(await manager.getProducts())
-    //console.log(await manager.getProdctById(2))
+    //console.log(await manager.getProdctById(6))
     //await manager.updateProduct(2,actualizar)
     //await manager.deleteProduct(3)
     //console.log(await manager.getProducts())
